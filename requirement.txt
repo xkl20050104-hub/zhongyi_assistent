@@ -1,0 +1,7 @@
+llama-index
+llama-index-llms-dashscope
+llama-index-embeddings-dashscope
+python-docx
+python-dotenv
+loguru
+tqdm
