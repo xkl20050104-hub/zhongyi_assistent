@@ -1,31 +1,30 @@
 import os
 from dotenv import load_dotenv
-from loguru import logger
-from modules.data_clean import clean_tcm_text
-from modules.query_engine import get_query_engine
 
+# 必须在所有逻辑开始前加载环境变量
 load_dotenv()
 
+from loguru import logger
+from modules.data_clean import clean_tcm_text
+from modules.query_engine import get_index
+from modules.work_flow import run_tcm_rag
 
 def run():
-    # 路径使用 r 前缀规避编码报错
     raw_doc = r"data/《中医临床诊疗术语第2部分：证候》（修订版）.docx"
     clean_txt = r"data/cleaned_corpus.txt"
     storage_path = r"data/storage"
 
     logger.info("=== 中医诊疗助手启动中 ===")
 
-    # 1. 自动执行数据清洗
+    # 1. 预处理
     if not os.path.exists(clean_txt):
-        logger.info("检测到未处理语料，启动清洗模块...")
+        logger.info("启动语料清洗...")
         clean_tcm_text(raw_doc, clean_txt)
-    else:
-        logger.debug("清洗后的语料已存在，跳过清洗步骤")
 
-    # 2. 获取引擎
-    engine = get_query_engine(data_dir="data", persist_dir=storage_path)
+    # 2. 初始化索引（仅执行一次）
+    index = get_index(data_dir="data", persist_dir=storage_path)
 
-    # 3. 交互循环
+    # 3. 问答循环
     print("\n" + "=" * 30)
     print("  中医诊疗助手 (输入 q 退出)")
     print("=" * 30)
@@ -33,13 +32,15 @@ def run():
     while True:
         question = input("\n问：")
         if question.lower() == 'q':
-            logger.info("用户主动退出程序")
+            logger.info("程序结束")
             break
 
-        logger.info(f"收到用户提问: {question}")
-        response = engine.query(question)
-        print(f"\n答：{response}")
+        if not question.strip(): continue
 
+        # 4. 执行细化后的 RAG 工作流
+        # 这将产生层级化的追踪图
+        response = run_tcm_rag(index, question)
+        print(f"\n答：{response}")
 
 if __name__ == "__main__":
     run()
