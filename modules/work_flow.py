@@ -16,16 +16,12 @@ def format_prompt(question, nodes):
 
 @traceable(run_type="llm", name="LLM_Generation")
 def call_llm(prompt):
-    # 这里是 Token 消耗产生的核心点
     response = Settings.llm.complete(prompt)
     return response
 
 @traceable(run_type="chain", name="TCM_Full_RAG_Flow")
 def run_tcm_rag(index, question):
-    # 1. 检索
     nodes = retrieve_docs(index, question)
-    # 2. 拼接
     full_prompt = format_prompt(question, nodes)
-    # 3. 生成
     response = call_llm(full_prompt)
     return response

@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# 必须在所有逻辑开始前加载环境变量
 load_dotenv()
 
 from loguru import logger
@@ -16,15 +15,12 @@ def run():
 
     logger.info("=== 中医诊疗助手启动中 ===")
 
-    # 1. 预处理
     if not os.path.exists(clean_txt):
         logger.info("启动语料清洗...")
         clean_tcm_text(raw_doc, clean_txt)
 
-    # 2. 初始化索引（仅执行一次）
     index = get_index(data_dir="data", persist_dir=storage_path)
 
-    # 3. 问答循环
     print("\n" + "=" * 30)
     print("  中医诊疗助手 (输入 q 退出)")
     print("=" * 30)
@@ -37,8 +33,6 @@ def run():
 
         if not question.strip(): continue
 
-        # 4. 执行细化后的 RAG 工作流
-        # 这将产生层级化的追踪图
         response = run_tcm_rag(index, question)
         print(f"\n答：{response}")
 

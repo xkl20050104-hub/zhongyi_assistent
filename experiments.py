@@ -98,9 +98,7 @@ if __name__ == "__main__":
         experiment_prefix="TCM_RAG_Final_Test",
         metadata={
             "judge_model": "qwen-max",  # 负责打分的模型
-            "rag_model": "qwen-plus",  # 负责生成回答的模型
-            "version": "1.0",
-            "model": "3"  # 这里的 key 必须和网页端列名对应
-        }
+        },
     )
-    print("评估完成！请刷新 LangSmith 网页查看指标。")
+
+    print("评估完成！请访问 LangSmith 查看结果。")
